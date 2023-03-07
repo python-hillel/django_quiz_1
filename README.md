@@ -42,11 +42,13 @@
 5. [ ] Наличие дампа данных
 6. [ ] bootstrap
 7. [ ] Unit Tests
-8. [ ] API + Tests
-9. [ ] Docker image
-10. [ ] Кэширование
-11. [ ] Планировщик
-12. [ ] Деплой на Amazon
+8. [ ] Docker image
+9. [ ] Деплой на Amazon
+10. [ ] Планировщик
+11. [ ] Кэширование
+
+
+ext.: [ ] API + Tests
 
 ## DB - Schema
 ![db](db_schema.png)
