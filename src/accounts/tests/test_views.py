@@ -26,7 +26,7 @@ class TestViews(TestCase):
         self.assertEqual(response.url, self.registration_done_url)
 
         user = User.objects.first()
-        self.assertEqual(user.username, self.data['username'])
+        self.assertEqual(user.username + '11', self.data['username'])
         self.assertEqual(user.email, self.data['email'])
         self.assertTrue(user.check_password(self.data['password1']))
         self.assertFalse(user.is_active)
