@@ -43,7 +43,7 @@
 4. [ ] PostgreSQL
 5. [ ] Наличие дампа данных
 6. [x] bootstrap
-7. [ ] Unit Tests
+7. [x] Unit Tests
 8. [ ] Docker image
 9. [ ] Деплой на Amazon
 10. [ ] Планировщик
