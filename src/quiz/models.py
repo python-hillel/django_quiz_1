@@ -86,8 +86,8 @@ class Result(BaseModel):
         correct_choice = [choice.is_correct for choice in question.choices.all()]
         correct_answer = True
         for group in zip(selected_choices, correct_choice):
-            # correct_answer = correct_answer and (group[0] == group[1])
-            correct_answer &= (group[0] == group[1])
+            correct_answer = correct_answer and (group[0] == group[1])
+            # correct_answer &= (group[0] == group[1])
 
         self.num_correct_answers += int(correct_answer)
         self.num_incorrect_answers += 1 - int(correct_answer)
@@ -97,3 +97,10 @@ class Result(BaseModel):
             self.state = self.STATE.FINISHED
 
         self.save()
+
+# [(False, False), (True, False), (False, False)]
+# False and False => False
+# False and True => False
+# True and False => False
+# True and True => True
+

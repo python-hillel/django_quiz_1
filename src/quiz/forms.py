@@ -9,8 +9,8 @@ class QuestionInlineFormSet(forms.BaseInlineFormSet):
         if not (self.instance.QUESTION_MIN_LIMIT <= len(self.forms) <= self.instance.QUESTION_MAX_LIMIT):
             raise ValidationError(
                 f'Questions count must be range '
-                f'от {self.instance.QUESTION_MIN_LIMIT} '
-                f'до {self.instance.QUESTION_MAX_LIMIT} inclusive'
+                f'from {self.instance.QUESTION_MIN_LIMIT} '
+                f'to {self.instance.QUESTION_MAX_LIMIT} inclusive'
             )
 
 
