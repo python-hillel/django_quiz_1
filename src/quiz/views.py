@@ -29,6 +29,15 @@ class ExamDetailView(LoginRequiredMixin, DetailView):
         uuid = self.kwargs.get('uuid')
         return self.model.objects.get(uuid=uuid)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['result_list'] = Result.objects.filter(
+            exam=self.get_object(),
+            user=self.request.user
+        ).order_by('state', '-create_timestamp')    # ORDER BY state ASC, create_timestamp DSC
+
+        return context
+
 
 class ExamResultCreateView(LoginRequiredMixin, CreateView):
     def post(self, request, *args, **kwargs):
@@ -52,27 +61,33 @@ class ExamResultCreateView(LoginRequiredMixin, CreateView):
 
 
 class ExamResultQuestionView(LoginRequiredMixin, UpdateView):
-    def get(self, request, *args, **kwargs):
+    def get_params(self, **kwargs):
         uuid = kwargs.get('uuid')
+        res_uuid = kwargs.get('res_uuid')
         order_num = kwargs.get('order_num')
-        question = Question.objects.get(
+
+        return uuid, res_uuid, order_num
+
+    def get_question(self, uuid, order_number):
+        return Question.objects.get(
             exam__uuid=uuid,
-            order_num=order_num
+            order_num=order_number
         )
+
+    def get(self, request, *args, **kwargs):
+        uuid, _, order_num = self.get_params(**kwargs)
+        # res = self.get_params(**kwargs)
+        # res[0], res[2]
+        question = self.get_question(uuid, order_num)
 
         choices = ChoicesFormSet(queryset=question.choices.all())
 
         return render(request, 'exams/question.html', context={'question': question, 'choices': choices})
 
     def post(self, request, *args, **kwargs):
-        uuid = kwargs.get('uuid')
-        res_uuid = kwargs.get('res_uuid')
-        order_num = kwargs.get('order_num')
+        uuid, res_uuid, order_num = self.get_params(**kwargs)
+        question = self.get_question(uuid, order_num)
 
-        question = Question.objects.get(
-            exam__uuid=uuid,
-            order_num=order_num
-        )
         choices = ChoicesFormSet(data=request.POST)
         selected_choices = ['is_selected' in form.changed_data for form in choices.forms]
 
@@ -100,3 +115,15 @@ class ExamResultQuestionView(LoginRequiredMixin, UpdateView):
                 }
             )
         )
+
+
+class ExamResultDetailView(LoginRequiredMixin, DetailView):
+    model = Result
+    template_name = 'results/details.html'
+    context_object_name = 'result'
+    pk_url_kwarg = 'uuid'
+
+    def get_object(self, queryset=None):
+        uuid = self.kwargs.get('res_uuid')
+
+        return self.get_queryset().get(uuid=uuid)
