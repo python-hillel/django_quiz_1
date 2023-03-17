@@ -2,7 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.views.generic import CreateView
+from django.views.generic import CreateView, DeleteView
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
@@ -57,7 +57,7 @@ class ExamResultCreateView(LoginRequiredMixin, CreateView):
                 kwargs={
                     'uuid': uuid,
                     'res_uuid': result.uuid,
-                    'order_num': 1
+                    # 'order_num': 1
                 }
             )
         )
@@ -67,7 +67,11 @@ class ExamResultQuestionView(LoginRequiredMixin, UpdateView):
     def get_params(self, **kwargs):
         uuid = kwargs.get('uuid')
         res_uuid = kwargs.get('res_uuid')
-        order_num = kwargs.get('order_num')
+        # order_num = kwargs.get('order_num')
+        order_num = Result.objects.filter(
+            uuid=res_uuid,
+            user=self.request.user
+        ).values('current_order_number').first().get('current_order_number') + 1
 
         return uuid, res_uuid, order_num
 
@@ -114,7 +118,7 @@ class ExamResultQuestionView(LoginRequiredMixin, UpdateView):
                 kwargs={
                     'uuid': uuid,
                     'res_uuid': res_uuid,
-                    'order_num': order_num + 1
+                    # 'order_num': order_num + 1
                 }
             )
         )
@@ -130,3 +134,30 @@ class ExamResultDetailView(LoginRequiredMixin, DetailView):
         uuid = self.kwargs.get('res_uuid')
 
         return self.get_queryset().get(uuid=uuid)
+
+
+class ExamResultUpdateView(LoginRequiredMixin, UpdateView):
+    def get(self, request, *args, **kwargs):
+        uuid = kwargs.get('uuid')
+        res_uuid = kwargs.get('res_uuid')
+        user = request.user
+
+        result = Result.objects.get(
+            user=user,
+            uuid=res_uuid
+        )
+
+        return HttpResponseRedirect(
+            reverse(
+                'quiz:question',
+                kwargs={
+                    'uuid': uuid,
+                    'res_uuid': res_uuid,
+                    # 'order_num': result.current_order_number + 1
+                }
+            )
+        )
+
+
+class ExamResultDeleteView(LoginRequiredMixin, DeleteView):
+    pass
