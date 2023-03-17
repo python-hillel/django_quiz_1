@@ -6,6 +6,7 @@ from django.views.generic import CreateView
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
+from django.views.generic.list import MultipleObjectMixin
 
 from .forms import ChoicesFormSet
 from .models import Exam
@@ -19,24 +20,26 @@ class ExamListView(LoginRequiredMixin, ListView):
     context_object_name = 'exams'       # object_list
 
 
-class ExamDetailView(LoginRequiredMixin, DetailView):
+class ExamDetailView(LoginRequiredMixin, DetailView, MultipleObjectMixin):
     model = Exam
     template_name = 'exams/details.html'
     context_object_name = 'exam'
     pk_url_kwarg = 'uuid'
+    paginate_by = 3
 
     def get_object(self, queryset=None):
         uuid = self.kwargs.get('uuid')
         return self.model.objects.get(uuid=uuid)
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['result_list'] = Result.objects.filter(
+        context = super().get_context_data(object_list=self.get_queryset(), **kwargs)
+        return context
+
+    def get_queryset(self):
+        return Result.objects.filter(
             exam=self.get_object(),
             user=self.request.user
         ).order_by('state', '-create_timestamp')    # ORDER BY state ASC, create_timestamp DSC
-
-        return context
 
 
 class ExamResultCreateView(LoginRequiredMixin, CreateView):
