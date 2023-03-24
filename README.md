@@ -53,3 +53,9 @@ ext.: [ ] API + Tests
 
 ## DB - Schema
 ![db](db_schema.png)
+
+
+> http://domain.name.com:345/  
+> http://domain.name.com:345/list/test/image.html  
+> http://domain.name.com:345/static/main.js  
+> http://domain.name.com:345/media/avtar.png  
