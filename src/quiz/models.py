@@ -101,9 +101,11 @@ class Result(BaseModel):
 
         self.save()
 
+    def points(self):
+        return max(0, self.num_correct_answers-self.num_incorrect_answers)
+
 # [(False, False), (True, False), (False, False)]
 # False and False => False
 # False and True => False
 # True and False => False
 # True and True => True
-
